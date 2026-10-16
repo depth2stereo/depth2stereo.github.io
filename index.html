@@ -78,41 +78,16 @@ h2 { font-family: var(--display); font-stretch: 80%; font-weight: 800; text-tran
 .prose p { margin: 0 0 16px; }
 .prose p:first-child::first-letter { font-family: var(--display); font-weight: 850; font-stretch: 68%; font-size: 3.4em; float: left; line-height: .8; padding: 6px 8px 0 0; color: var(--red); }
 
-/* pipeline diagram */
-.flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; list-style: none; margin: 0; padding: 0; }
-.flow li { border: 3px solid var(--ink); padding: 14px 14px 16px; position: relative; min-width: 0; }
-.flow li + li { border-left: 0; }
-.flow li:not(:last-child)::after { content: ""; position: absolute; right: -11px; top: 50%; width: 16px; height: 16px; background: var(--paper); border-top: 3px solid var(--ink); border-right: 3px solid var(--ink); transform: translateY(-50%) rotate(45deg); z-index: 1; }
-.flow .tag { font-family: var(--mono); font-size: 11px; text-transform: uppercase; color: var(--grey); }
-.flow h3 { font-family: var(--display); font-stretch: 85%; font-weight: 800; text-transform: uppercase; font-size: 19px; margin: 4px 0 6px; line-height: 1.05; }
-.flow p { margin: 0; font-size: 14px; line-height: 1.45; color: #333338; }
-.flow li.out { background: var(--ink); color: var(--paper); }
-.flow li.out p { color: #d8d8dc; }
-.flow li.out .tag { color: #9a9aa2; }
-
-/* models */
-.models { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 620px; }
-.tbl { overflow-x: auto; }
-.models th { text-align: left; font-family: var(--mono); font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--grey); padding: 0 12px 10px 0; border-bottom: 3px solid var(--ink); }
-.models td { padding: 14px 12px 14px 0; border-bottom: 1px solid var(--hair); vertical-align: top; }
-.models td:first-child { font-family: var(--display); font-stretch: 85%; font-weight: 800; font-size: 18px; text-transform: uppercase; white-space: nowrap; line-height: 1.2; }
-.fine { font-size: 14px; color: var(--grey); margin: 16px 0 0; max-width: 70ch; }
-
 /* people */
 .people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
 .person { border-left: 3px solid var(--ink); padding: 4px 18px 6px; min-width: 0; }
 .person .role { font-family: var(--mono); font-size: 11px; text-transform: uppercase; color: var(--grey); }
 .person .name { font-family: var(--display); font-stretch: 80%; font-weight: 800; font-size: 26px; text-transform: uppercase; line-height: 1.05; margin-top: 4px; }
 .people + .people { margin-top: 28px; }
+.people.members { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 960px) { .people.members { grid-template-columns: repeat(2, 1fr); row-gap: 18px; } }
 .people.staff .person { border-left-color: var(--red); }
 .people.staff .person:nth-child(n+2) { border-left-color: var(--cyan); }
-
-/* schedule */
-.sched { list-style: none; margin: 0; padding: 0; }
-.sched li { display: grid; grid-template-columns: 170px 1fr; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
-.sched li:first-child { border-top: 3px solid var(--ink); }
-.sched .when { font-family: var(--mono); font-size: 13px; font-weight: 600; text-transform: uppercase; padding-top: 2px; }
-.sched li.now .when { color: var(--red); }
 
 footer { border-top: 3px solid var(--ink); }
 footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 16px 24px; text-transform: uppercase; color: var(--grey); }
@@ -121,13 +96,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
   .hero .wrap { grid-template-columns: 1fr; }
   .block .wrap { grid-template-columns: 1fr; gap: 12px; }
   .label .n { font-size: 48px; }
-  .flow { grid-template-columns: 1fr; }
-  .flow li + li { border-left: 3px solid var(--ink); border-top: 0; }
-  .flow li:not(:last-child)::after { right: auto; left: 50%; top: auto; bottom: -11px; transform: translateX(-50%) rotate(135deg); }
 }
 @media (max-width: 640px) {
-  .people { grid-template-columns: 1fr; gap: 14px; }
-  .sched li { grid-template-columns: 1fr; gap: 2px; }
+  .people, .people.members { grid-template-columns: 1fr; gap: 14px; }
 }
 </style>
 </head>
@@ -138,10 +109,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
     <span>TED University / Computer Engineering / CMPE 491 / 2026–27</span>
     <nav>
       <a href="#about">About</a>
-      <a href="#pipeline">Pipeline</a>
-      <a href="#models">Models</a>
       <a href="#team">Team</a>
-      <a href="#schedule">Schedule</a>
     </nav>
   </div>
 </div>
@@ -152,7 +120,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
       <h1>Deep Learning Based <span class="ana">2D-to-3D</span> Stereo Video Conversion
         <small>with Anaglyph Display</small></h1>
       <dl class="hero-meta">
-        <dt>Team</dt><dd>Ali Baştaş, Kadir Tekgül, Eren Medetoğulları</dd>
+        <dt>Team</dt><dd>Ali Baştaş, Kadir Tekgül, Eren Medetoğulları, Eren Özbek</dd>
         <dt>Supervisor</dt><dd>Yücel Çimtay</dd>
         <dt>Jury</dt><dd>Mehmet Evren Coşkun, Tolga Kurtuluş Çapın</dd>
       </dl>
@@ -189,53 +157,18 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
   </div>
 </section>
 
-<section class="block" id="pipeline">
-  <div class="wrap">
-    <div class="label mono"><span class="n c">02</span>Pipeline</div>
-    <div>
-      <h2>From frame to anaglyph</h2>
-      <ol class="flow">
-        <li><span class="tag">Input</span><h3>Camera</h3><p>Frames from a USB webcam or laptop camera via OpenCV.</p></li>
-        <li><span class="tag">Model</span><h3>Depth</h3><p>A pretrained monocular network predicts per-pixel depth.</p></li>
-        <li><span class="tag">Geometry</span><h3>DIBR</h3><p>Depth becomes disparity; the frame is warped into L and R views.</p></li>
-        <li><span class="tag">Cleanup</span><h3>Fill</h3><p>Inpainting for holes, temporal smoothing against flicker.</p></li>
-        <li class="out"><span class="tag">Output</span><h3>Anaglyph</h3><p>R from the left view, G+B from the right, full screen.</p></li>
-      </ol>
-    </div>
-  </div>
-</section>
 
-<section class="block" id="models">
-  <div class="wrap">
-    <div class="label mono"><span class="n r">03</span>Models</div>
-    <div>
-      <h2>Depth networks under test</h2>
-      <div class="tbl">
-        <table class="models">
-          <thead><tr><th>Model</th><th>Approach</th><th>Why it is on the list</th></tr></thead>
-          <tbody>
-            <tr><td>Depth Anything V2</td><td>ViT trained on synthetic and pseudo-labeled real images</td><td>Strong zero-shot results, small variants run fast</td></tr>
-            <tr><td>MiDaS 3.1 / DPT</td><td>Dense prediction transformer, relative depth</td><td>Standard baseline with many speed/accuracy options</td></tr>
-            <tr><td>ZoeDepth</td><td>Relative backbone with metric depth heads</td><td>Does metric depth give a more natural stereo effect?</td></tr>
-            <tr><td>Depth Pro</td><td>High-resolution metric depth, sharp edges</td><td>Cleaner object borders after warping</td></tr>
-            <tr><td>Video Depth Anything</td><td>Temporally consistent video depth</td><td>Less flicker than per-frame estimation</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="fine">Final selection after the literature review. Compared on FPS on our hardware, temporal stability, edge artifacts, and a short user study on perceived depth and viewing comfort.</p>
-    </div>
-  </div>
-</section>
 
 <section class="block" id="team">
   <div class="wrap">
-    <div class="label mono"><span class="n c">04</span>Team</div>
+    <div class="label mono"><span class="n c">02</span>Team</div>
     <div>
       <h2>People</h2>
-      <div class="people">
+      <div class="people members">
         <div class="person"><div class="role">Member</div><div class="name">Ali Baştaş</div></div>
         <div class="person"><div class="role">Member</div><div class="name">Kadir Tekgül</div></div>
         <div class="person"><div class="role">Member</div><div class="name">Eren Medetoğulları</div></div>
+        <div class="person"><div class="role">Member</div><div class="name">Eren Özbek</div></div>
       </div>
       <div class="people staff">
         <div class="person"><div class="role">Supervisor</div><div class="name">Yücel Çimtay</div></div>
@@ -246,22 +179,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
   </div>
 </section>
 
-<section class="block" id="schedule">
-  <div class="wrap">
-    <div class="label mono"><span class="n r">05</span>Schedule</div>
-    <div>
-      <h2>Plan</h2>
-      <ul class="sched">
-        <li class="now"><span class="when">Oct 2026</span><span>Topic and project proposal</span></li>
-        <li><span class="when">Nov 2026</span><span>Literature review: 2D-to-3D conversion, monocular depth estimation</span></li>
-        <li><span class="when">Dec 2026</span><span>Analysis and design reports, first camera-to-anaglyph prototype</span></li>
-        <li><span class="when">Spring 2027</span><span>Multiple depth models, hole filling, temporal smoothing</span></li>
-        <li><span class="when">Spring 2027</span><span>Comparison, user study, performance tuning</span></li>
-        <li><span class="when">Jun 2027</span><span>Final report and live demo with anaglyph glasses</span></li>
-      </ul>
-    </div>
-  </div>
-</section>
 
 <footer class="mono">
   <div class="wrap">
