@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2D-to-3D Stereo Conversion | TEDU CMPE 491</title>
+<meta name="description" content="Deep Learning Based 2D-to-3D (Stereo) Video Conversion with Anaglyph Display. TED University senior design project.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Public+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --paper: #ffffff;
+  --ink: #0c0c0e;
+  --grey: #6a6a70;
+  --hair: #e3e3e6;
+  --red: #e10600;
+  --cyan: #00a8c6;
+  --display: "Archivo", "Arial Narrow", Impact, sans-serif;
+  --body: "Public Sans", "Segoe UI", Arial, sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+a { color: inherit; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+.mono { font-family: var(--mono); font-size: 12px; letter-spacing: .04em; }
+
+/* slug line */
+.slug { border-bottom: 3px solid var(--ink); }
+.slug .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: 10px; text-transform: uppercase; }
+.slug nav { display: flex; gap: 22px; flex-wrap: wrap; }
+.slug nav a { text-decoration: none; }
+.slug nav a:hover { color: var(--red); }
+
+/* hero */
+.hero .wrap { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; padding-block: 44px 56px; align-items: end; }
+.hero .wrap > * { min-width: 0; }
+h1 {
+  font-family: var(--display); font-stretch: 68%; font-weight: 850; text-transform: uppercase;
+  font-size: clamp(2.8rem, 7.2vw, 6.2rem); line-height: .9; letter-spacing: -.01em; margin: 0;
+}
+h1 .ana { color: var(--ink); text-shadow: -.045em 0 var(--red), .045em 0 var(--cyan); display: inline-block; }
+h1 small { display: block; font-size: .36em; line-height: 1.1; font-weight: 700; letter-spacing: .01em; margin-top: .55em; color: var(--grey); }
+.hero-meta { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; margin-top: 30px; font-size: 15px; }
+.hero-meta dt { font-family: var(--mono); font-size: 12px; text-transform: uppercase; color: var(--grey); padding-top: 3px; }
+.hero-meta dd { margin: 0; font-weight: 500; }
+
+/* stereo card */
+.card { border: 3px solid var(--ink); background: var(--paper); margin: 0; }
+.card-head { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 3px solid var(--ink); text-transform: uppercase; gap: 10px; flex-wrap: wrap; }
+.card canvas { display: block; width: 100%; height: auto; max-width: 100%; aspect-ratio: 4 / 3; }
+.eyes { display: grid; grid-template-columns: 1fr 1fr; border-top: 3px solid var(--ink); }
+.eyes figure { margin: 0; position: relative; }
+.eyes figure + figure { border-left: 3px solid var(--ink); }
+.eyes figcaption { position: absolute; left: 8px; top: 6px; font-family: var(--mono); font-size: 11px; font-weight: 600; padding: 1px 6px; color: #fff; }
+.eyes .l figcaption { background: var(--red); }
+.eyes .r figcaption { background: var(--cyan); }
+.ctrl { display: flex; justify-content: space-between; align-items: center; gap: 10px 16px; flex-wrap: wrap; padding: 10px 12px; border-top: 3px solid var(--ink); }
+.toggle { display: inline-flex; border: 2px solid var(--ink); }
+.toggle button { font: 600 12px var(--mono); text-transform: uppercase; background: var(--paper); color: var(--ink); border: 0; padding: 5px 10px; cursor: pointer; }
+.toggle button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.ctrl label { display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
+.ctrl input[type=range] { width: 110px; accent-color: var(--red); }
+
+/* sections */
+.block { border-top: 3px solid var(--ink); }
+.block .wrap { display: grid; grid-template-columns: 220px 1fr; gap: 32px; padding-block: 48px 56px; }
+.block .wrap > * { min-width: 0; }
+.label { text-transform: uppercase; }
+.label .n { display: block; font-family: var(--display); font-stretch: 68%; font-weight: 850; font-size: 64px; line-height: .85; margin-bottom: 8px; }
+.label .n.r { color: var(--red); }
+.label .n.c { color: var(--cyan); }
+h2 { font-family: var(--display); font-stretch: 80%; font-weight: 800; text-transform: uppercase; font-size: clamp(1.7rem, 3.2vw, 2.5rem); line-height: 1; margin: 0 0 22px; }
+.prose { max-width: 66ch; }
+.prose p { margin: 0 0 16px; }
+.prose p:first-child::first-letter { font-family: var(--display); font-weight: 850; font-stretch: 68%; font-size: 3.4em; float: left; line-height: .8; padding: 6px 8px 0 0; color: var(--red); }
+
+/* pipeline diagram */
+.flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; list-style: none; margin: 0; padding: 0; }
+.flow li { border: 3px solid var(--ink); padding: 14px 14px 16px; position: relative; min-width: 0; }
+.flow li + li { border-left: 0; }
+.flow li:not(:last-child)::after { content: ""; position: absolute; right: -11px; top: 50%; width: 16px; height: 16px; background: var(--paper); border-top: 3px solid var(--ink); border-right: 3px solid var(--ink); transform: translateY(-50%) rotate(45deg); z-index: 1; }
+.flow .tag { font-family: var(--mono); font-size: 11px; text-transform: uppercase; color: var(--grey); }
+.flow h3 { font-family: var(--display); font-stretch: 85%; font-weight: 800; text-transform: uppercase; font-size: 19px; margin: 4px 0 6px; line-height: 1.05; }
+.flow p { margin: 0; font-size: 14px; line-height: 1.45; color: #333338; }
+.flow li.out { background: var(--ink); color: var(--paper); }
+.flow li.out p { color: #d8d8dc; }
+.flow li.out .tag { color: #9a9aa2; }
+
+/* models */
+.models { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 620px; }
+.tbl { overflow-x: auto; }
+.models th { text-align: left; font-family: var(--mono); font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--grey); padding: 0 12px 10px 0; border-bottom: 3px solid var(--ink); }
+.models td { padding: 14px 12px 14px 0; border-bottom: 1px solid var(--hair); vertical-align: top; }
+.models td:first-child { font-family: var(--display); font-stretch: 85%; font-weight: 800; font-size: 18px; text-transform: uppercase; white-space: nowrap; line-height: 1.2; }
+.fine { font-size: 14px; color: var(--grey); margin: 16px 0 0; max-width: 70ch; }
+
+/* people */
+.people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+.person { border-left: 3px solid var(--ink); padding: 4px 18px 6px; min-width: 0; }
+.person .role { font-family: var(--mono); font-size: 11px; text-transform: uppercase; color: var(--grey); }
+.person .name { font-family: var(--display); font-stretch: 80%; font-weight: 800; font-size: 26px; text-transform: uppercase; line-height: 1.05; margin-top: 4px; }
+.people + .people { margin-top: 28px; }
+.people.staff .person { border-left-color: var(--red); }
+.people.staff .person:nth-child(n+2) { border-left-color: var(--cyan); }
+
+/* schedule */
+.sched { list-style: none; margin: 0; padding: 0; }
+.sched li { display: grid; grid-template-columns: 170px 1fr; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
+.sched li:first-child { border-top: 3px solid var(--ink); }
+.sched .when { font-family: var(--mono); font-size: 13px; font-weight: 600; text-transform: uppercase; padding-top: 2px; }
+.sched li.now .when { color: var(--red); }
+
+footer { border-top: 3px solid var(--ink); }
+footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 16px 24px; text-transform: uppercase; color: var(--grey); }
+
+@media (max-width: 960px) {
+  .hero .wrap { grid-template-columns: 1fr; }
+  .block .wrap { grid-template-columns: 1fr; gap: 12px; }
+  .label .n { font-size: 48px; }
+  .flow { grid-template-columns: 1fr; }
+  .flow li + li { border-left: 3px solid var(--ink); border-top: 0; }
+  .flow li:not(:last-child)::after { right: auto; left: 50%; top: auto; bottom: -11px; transform: translateX(-50%) rotate(135deg); }
+}
+@media (max-width: 640px) {
+  .people { grid-template-columns: 1fr; gap: 14px; }
+  .sched li { grid-template-columns: 1fr; gap: 2px; }
+}
+</style>
+</head>
+<body>
+
+<div class="slug mono">
+  <div class="wrap">
+    <span>TED University / Computer Engineering / CMPE 491 / 2026–27</span>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#models">Models</a>
+      <a href="#team">Team</a>
+      <a href="#schedule">Schedule</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Deep Learning Based <span class="ana">2D-to-3D</span> Stereo Video Conversion
+        <small>with Anaglyph Display</small></h1>
+      <dl class="hero-meta">
+        <dt>Team</dt><dd>Ali Baştaş, Kadir Tekgül, Eren Medetoğulları</dd>
+        <dt>Supervisor</dt><dd>Yücel Çimtay</dd>
+        <dt>Jury</dt><dd>Mehmet Evren Coşkun, Tolga Kurtuluş Çapın</dd>
+      </dl>
+    </div>
+
+    <figure class="card">
+      <div class="card-head mono"><span>Stereo preview</span><span>Red = left eye</span></div>
+      <canvas id="cv" width="640" height="480" aria-label="Anaglyph composite of a test scene"></canvas>
+      <div class="eyes">
+        <figure class="l"><canvas id="cl" width="320" height="240" aria-label="Left eye view"></canvas><figcaption>L</figcaption></figure>
+        <figure class="r"><canvas id="cr" width="320" height="240" aria-label="Right eye view"></canvas><figcaption>R</figcaption></figure>
+      </div>
+      <div class="ctrl mono">
+        <div class="toggle" role="group" aria-label="View">
+          <button id="b-ana" aria-pressed="true">Anaglyph</button>
+          <button id="b-depth" aria-pressed="false">Depth</button>
+        </div>
+        <label for="disp">Baseline <input id="disp" type="range" min="0" max="30" value="14"></label>
+      </div>
+    </figure>
+  </div>
+</header>
+
+<section class="block" id="about">
+  <div class="wrap">
+    <div class="label mono"><span class="n r">01</span>About</div>
+    <div>
+      <h2>One camera in, 3D out</h2>
+      <div class="prose">
+        <p>This project aims to build a system that converts the monocular (single-view) video stream of a standard camera into stereoscopic 3D, without any stereo camera hardware. For each captured frame, a state-of-the-art deep learning model estimates a dense depth map. Using depth-image-based rendering (DIBR), the system then synthesizes separate left-eye and right-eye views, and fills the disoccluded regions that appear after the view shift with inpainting techniques. Temporal smoothing will be applied to reduce flicker between consecutive frames.</p>
+        <p>The resulting stereo pair is combined into a red–cyan anaglyph image and shown on an ordinary PC monitor, so that the user perceives depth with inexpensive anaglyph glasses. Several recent deep learning based monocular depth estimation methods will be integrated with the camera and compared in terms of depth quality, perceived 3D effect, temporal stability and frame rate (FPS). The outcome is a low-cost 2D-to-3D conversion product that can be used in education, entertainment and video communication.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="pipeline">
+  <div class="wrap">
+    <div class="label mono"><span class="n c">02</span>Pipeline</div>
+    <div>
+      <h2>From frame to anaglyph</h2>
+      <ol class="flow">
+        <li><span class="tag">Input</span><h3>Camera</h3><p>Frames from a USB webcam or laptop camera via OpenCV.</p></li>
+        <li><span class="tag">Model</span><h3>Depth</h3><p>A pretrained monocular network predicts per-pixel depth.</p></li>
+        <li><span class="tag">Geometry</span><h3>DIBR</h3><p>Depth becomes disparity; the frame is warped into L and R views.</p></li>
+        <li><span class="tag">Cleanup</span><h3>Fill</h3><p>Inpainting for holes, temporal smoothing against flicker.</p></li>
+        <li class="out"><span class="tag">Output</span><h3>Anaglyph</h3><p>R from the left view, G+B from the right, full screen.</p></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="models">
+  <div class="wrap">
+    <div class="label mono"><span class="n r">03</span>Models</div>
+    <div>
+      <h2>Depth networks under test</h2>
+      <div class="tbl">
+        <table class="models">
+          <thead><tr><th>Model</th><th>Approach</th><th>Why it is on the list</th></tr></thead>
+          <tbody>
+            <tr><td>Depth Anything V2</td><td>ViT trained on synthetic and pseudo-labeled real images</td><td>Strong zero-shot results, small variants run fast</td></tr>
+            <tr><td>MiDaS 3.1 / DPT</td><td>Dense prediction transformer, relative depth</td><td>Standard baseline with many speed/accuracy options</td></tr>
+            <tr><td>ZoeDepth</td><td>Relative backbone with metric depth heads</td><td>Does metric depth give a more natural stereo effect?</td></tr>
+            <tr><td>Depth Pro</td><td>High-resolution metric depth, sharp edges</td><td>Cleaner object borders after warping</td></tr>
+            <tr><td>Video Depth Anything</td><td>Temporally consistent video depth</td><td>Less flicker than per-frame estimation</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fine">Final selection after the literature review. Compared on FPS on our hardware, temporal stability, edge artifacts, and a short user study on perceived depth and viewing comfort.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="team">
+  <div class="wrap">
+    <div class="label mono"><span class="n c">04</span>Team</div>
+    <div>
+      <h2>People</h2>
+      <div class="people">
+        <div class="person"><div class="role">Member</div><div class="name">Ali Baştaş</div></div>
+        <div class="person"><div class="role">Member</div><div class="name">Kadir Tekgül</div></div>
+        <div class="person"><div class="role">Member</div><div class="name">Eren Medetoğulları</div></div>
+      </div>
+      <div class="people staff">
+        <div class="person"><div class="role">Supervisor</div><div class="name">Yücel Çimtay</div></div>
+        <div class="person"><div class="role">Jury</div><div class="name">Mehmet Evren Coşkun</div></div>
+        <div class="person"><div class="role">Jury</div><div class="name">Tolga Kurtuluş Çapın</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="schedule">
+  <div class="wrap">
+    <div class="label mono"><span class="n r">05</span>Schedule</div>
+    <div>
+      <h2>Plan</h2>
+      <ul class="sched">
+        <li class="now"><span class="when">Oct 2026</span><span>Topic and project proposal</span></li>
+        <li><span class="when">Nov 2026</span><span>Literature review: 2D-to-3D conversion, monocular depth estimation</span></li>
+        <li><span class="when">Dec 2026</span><span>Analysis and design reports, first camera-to-anaglyph prototype</span></li>
+        <li><span class="when">Spring 2027</span><span>Multiple depth models, hole filling, temporal smoothing</span></li>
+        <li><span class="when">Spring 2027</span><span>Comparison, user study, performance tuning</span></li>
+        <li><span class="when">Jun 2027</span><span>Final report and live demo with anaglyph glasses</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="mono">
+  <div class="wrap">
+    <span>2D-to-3D Stereo Conversion</span>
+    <span>TED University, Ankara</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  var cl = document.getElementById('cl').getContext('2d'), cr = document.getElementById('cr').getContext('2d');
+  var W = cv.width, H = cv.height;
+  var slider = document.getElementById('disp');
+  var bA = document.getElementById('b-ana'), bD = document.getElementById('b-depth');
+  var mode = 'ana';
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var objs = [
+    { t: 'c', x: 470, y: 150, r: 70, z: .25 },
+    { t: 'r', x: 90, y: 200, w: 150, h: 170, z: .45 },
+    { t: 'c', x: 360, y: 310, r: 80, z: .7 },
+    { t: 't', x: 200, y: 400, s: 110, z: .95 }
+  ];
+  function shape(c, o, dx) {
+    c.beginPath();
+    if (o.t === 'c') c.arc(o.x + dx, o.y, o.r, 0, 6.2832);
+    else if (o.t === 'r') c.rect(o.x + dx, o.y, o.w, o.h);
+    else { c.moveTo(o.x + dx, o.y - o.s); c.lineTo(o.x + dx + o.s, o.y + o.s * .2); c.lineTo(o.x + dx - o.s * .9, o.y + o.s * .3); c.closePath(); }
+  }
+  function g(z) { var v = Math.round(225 - z * 175); return 'rgb(' + v + ',' + v + ',' + v + ')'; }
+  function wob(o, t) { return still ? 0 : Math.sin(t / 900 + o.z * 6) * 6 * o.z; }
+  var buf = [document.createElement('canvas'), document.createElement('canvas')];
+  buf.forEach(function (b) { b.width = W; b.height = H; });
+  function eye(c, s, k, t) {
+    c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+    c.fillStyle = '#f0f0f0'; c.fillRect(0, 0, W, 300);
+    c.strokeStyle = '#aaa'; c.lineWidth = 2;
+    for (var i = 0; i < 9; i++) { var y = 300 + i * i * 2.6; c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
+    for (var j = -6; j <= 6; j++) { c.beginPath(); c.moveTo(W / 2 + j * 40 - s * k * .5, 300); c.lineTo(W / 2 + j * 150 + s * k * .5, H); c.stroke(); }
+    objs.forEach(function (o) { shape(c, o, s * k * (o.z - .5) + wob(o, t)); c.fillStyle = g(o.z); c.fill(); c.lineWidth = 3; c.strokeStyle = '#282828'; c.stroke(); });
+  }
+  function depth(t) {
+    ctx.fillStyle = g(0); ctx.fillRect(0, 0, W, 300);
+    var gr = ctx.createLinearGradient(0, 300, 0, H); gr.addColorStop(0, g(0)); gr.addColorStop(1, g(1));
+    ctx.fillStyle = gr; ctx.fillRect(0, 300, W, H - 300);
+    objs.forEach(function (o) { shape(ctx, o, wob(o, t)); var v = Math.round(40 + o.z * 215); ctx.fillStyle = 'rgb(' + v + ',' + v + ',' + v + ')'; ctx.fill(); });
+    ctx.fillStyle = 'rgba(0,0,0,.65)'; ctx.font = '600 14px "JetBrains Mono", monospace'; ctx.fillText('NEAR = BRIGHT', 14, 26);
+  }
+  function draw(t) {
+    var k = +slider.value, L = buf[0].getContext('2d'), R = buf[1].getContext('2d');
+    eye(L, 1, k, t); eye(R, -1, k, t);
+    cl.drawImage(buf[0], 0, 0, 320, 240); cr.drawImage(buf[1], 0, 0, 320, 240);
+    if (mode === 'depth') depth(t);
+    else {
+      var A = L.getImageData(0, 0, W, H).data, B = R.getImageData(0, 0, W, H).data;
+      var out = ctx.createImageData(W, H), O = out.data;
+      for (var i = 0; i < O.length; i += 4) { O[i] = A[i]; O[i + 1] = B[i]; O[i + 2] = B[i]; O[i + 3] = 255; }
+      ctx.putImageData(out, 0, 0);
+    }
+    if (!still) requestAnimationFrame(draw);
+  }
+  function set(m) { mode = m; bA.setAttribute('aria-pressed', m === 'ana'); bD.setAttribute('aria-pressed', m === 'depth'); if (still) draw(0); }
+  bA.onclick = function () { set('ana'); };
+  bD.onclick = function () { set('depth'); };
+  slider.oninput = function () { if (still) draw(0); };
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
