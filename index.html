@@ -89,6 +89,45 @@ h2 { font-family: var(--display); font-stretch: 80%; font-weight: 800; text-tran
 .people.staff .person { border-left-color: var(--red); }
 .people.staff .person:nth-child(n+2) { border-left-color: var(--cyan); }
 
+/* example walkthrough */
+.lead { margin: -8px 0 22px; color: var(--grey); max-width: 60ch; }
+.steps4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.shot { margin: 0; border: 3px solid var(--ink); background: var(--paper); min-width: 0; }
+.shot canvas { display: block; width: 100%; height: auto; max-width: 100%; aspect-ratio: 4 / 3; }
+.shot figcaption { border-top: 3px solid var(--ink); padding: 8px 10px 12px; font-size: 14px; line-height: 1.45; }
+.shot .tag { display: block; font-family: var(--mono); font-size: 11px; text-transform: uppercase; color: var(--grey); }
+.shot b { display: block; font-family: var(--display); font-stretch: 85%; font-weight: 800; text-transform: uppercase; font-size: 18px; line-height: 1.05; margin: 2px 0 4px; }
+.sw { display: inline-block; width: 10px; height: 10px; background: #ff2bd6; vertical-align: -1px; margin-right: 4px; }
+.shot.wide { display: grid; grid-template-columns: 1.5fr 1fr; margin-top: 14px; }
+.shot.wide figcaption { border-top: 0; border-left: 3px solid var(--ink); padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+.shot.wide figcaption p { margin: 0; }
+.shot.wide b { font-size: 26px; }
+.slide { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: auto; padding-top: 12px; font-size: 12px; text-transform: uppercase; }
+.slide input { flex: 1; min-width: 120px; accent-color: var(--red); }
+.fine { font-size: 14px; color: var(--grey); margin: 16px 0 0; max-width: 72ch; }
+
+/* uses */
+.uses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+.use { border-left: 3px solid var(--ink); padding: 2px 20px 4px; min-width: 0; }
+.use h3 { font-family: var(--display); font-stretch: 80%; font-weight: 800; text-transform: uppercase; font-size: 24px; line-height: 1.05; margin: 0 0 8px; }
+.use p { margin: 0; color: #333338; }
+.tip { margin-top: 32px; background: var(--ink); color: var(--paper); padding: 14px 18px; display: flex; align-items: center; gap: 12px 18px; flex-wrap: wrap; font-size: 13px; }
+.tip a { color: var(--paper); text-decoration-color: var(--cyan); text-underline-offset: 3px; margin-left: auto; }
+.glasses { display: inline-flex; gap: 6px; padding: 4px 8px; border: 2px solid var(--paper); border-radius: 3px; }
+.glasses i { display: block; width: 22px; height: 13px; }
+.glasses i:first-child { background: var(--red); }
+.glasses i:last-child { background: var(--cyan); }
+
+/* references */
+.refs { list-style: none; margin: 0; padding: 0; counter-reset: r; }
+.refs li { counter-increment: r; display: grid; grid-template-columns: 44px 1fr; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
+.refs li:first-child { border-top: 3px solid var(--ink); }
+.refs li::before { content: "[" counter(r) "]"; font-family: var(--mono); font-size: 13px; color: var(--grey); padding-top: 2px; }
+.refs .t { font-weight: 700; }
+.refs .t a { color: var(--ink); text-decoration-color: var(--cyan); text-underline-offset: 3px; text-decoration-thickness: 2px; }
+.refs .t a:hover { color: var(--red); }
+.refs .v { display: block; color: var(--grey); font-size: 15px; }
+
 footer { border-top: 3px solid var(--ink); }
 footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 16px 24px; text-transform: uppercase; color: var(--grey); }
 
@@ -97,8 +136,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
   .block .wrap { grid-template-columns: 1fr; gap: 12px; }
   .label .n { font-size: 48px; }
 }
+@media (max-width: 960px) {
+  .steps4 { grid-template-columns: repeat(2, 1fr); }
+  .shot.wide { grid-template-columns: 1fr; }
+  .shot.wide figcaption { border-left: 0; border-top: 3px solid var(--ink); }
+  .uses { grid-template-columns: 1fr; gap: 18px; }
+}
 @media (max-width: 640px) {
   .people, .people.members { grid-template-columns: 1fr; gap: 14px; }
+  .tip a { margin-left: 0; }
 }
 </style>
 </head>
@@ -109,7 +155,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
     <span>TED University / Computer Engineering / CMPE 491 / 2026–27</span>
     <nav>
       <a href="#about">About</a>
+      <a href="#example">Example</a>
+      <a href="#use">Use</a>
       <a href="#team">Team</a>
+      <a href="#refs">References</a>
     </nav>
   </div>
 </div>
@@ -159,9 +208,49 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
 
 
 
+<section class="block" id="example">
+  <div class="wrap">
+    <div class="label mono"><span class="n c">02</span>Example</div>
+    <div>
+      <h2>One frame, step by step</h2>
+      <p class="lead">What the system does to every frame coming from the camera, shown on a test scene.</p>
+      <div class="steps4">
+        <figure class="shot"><canvas id="s1" width="400" height="300" aria-label="Input frame"></canvas><figcaption><span class="tag">Step 1</span><b>Input frame</b>One image from a single ordinary camera.</figcaption></figure>
+        <figure class="shot"><canvas id="s2" width="400" height="300" aria-label="Depth map"></canvas><figcaption><span class="tag">Step 2</span><b>Depth map</b>A depth value for every pixel. Brighter means nearer.</figcaption></figure>
+        <figure class="shot"><canvas id="s3" width="400" height="300" aria-label="Shifted view with holes"></canvas><figcaption><span class="tag">Step 3</span><b>Shifted view</b>Pixels move sideways by an amount set by their depth. <span class="sw"></span>Pink areas were hidden behind objects and have no data.</figcaption></figure>
+        <figure class="shot"><canvas id="s4" width="400" height="300" aria-label="View after hole filling"></canvas><figcaption><span class="tag">Step 4</span><b>Hole filling</b>The gaps are filled from the background side.</figcaption></figure>
+      </div>
+      <figure class="shot wide">
+        <canvas id="s5" width="400" height="300" aria-label="Anaglyph output"></canvas>
+        <figcaption>
+          <span class="tag">Step 5</span><b>Anaglyph output</b>
+          <p>The left view goes into the red channel and the right view into green and blue. Through red–cyan glasses each eye sees only its own view, and the brain combines the two into depth.</p>
+          <label class="slide mono" for="k2">Stereo strength <input id="k2" type="range" min="0" max="40" value="24"></label>
+        </figcaption>
+      </figure>
+      <p class="fine">Computed live in your browser on a synthetic scene whose depth is known. In the project the input is a live camera feed and the depth map is predicted by deep learning models.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="use">
+  <div class="wrap">
+    <div class="label mono"><span class="n r">03</span>Use</div>
+    <div>
+      <h2>Where it helps</h2>
+      <div class="uses">
+        <div class="use"><h3>Education</h3><p>Depth for lab footage, models and demonstrations, using the cameras and screens a classroom already has.</p></div>
+        <div class="use"><h3>Entertainment</h3><p>A 3D effect for ordinary 2D videos, watched with low-cost paper glasses.</p></div>
+        <div class="use"><h3>Video calls</h3><p>Stereo video from a normal webcam, with no stereo camera on either side of the call.</p></div>
+      </div>
+      <div class="tip"><span class="glasses" aria-hidden="true"><i></i><i></i></span><span class="mono">How to view: red lens over the left eye, cyan over the right. Any monitor works.</span><a class="mono" href="https://commons.wikimedia.org/wiki/File:Zaporigya._Hortica_island._Dnepr_river._3D_photo_Anaglif_-_panoramio_%281%29.jpg" target="_blank" rel="noopener">See a real anaglyph photo &#8599;</a></div>
+    </div>
+  </div>
+</section>
+
 <section class="block" id="team">
   <div class="wrap">
-    <div class="label mono"><span class="n c">02</span>Team</div>
+    <div class="label mono"><span class="n c">04</span>Team</div>
     <div>
       <h2>People</h2>
       <div class="people members">
@@ -179,6 +268,26 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
   </div>
 </section>
 
+
+<section class="block" id="refs">
+  <div class="wrap">
+    <div class="label mono"><span class="n r">05</span>References</div>
+    <div>
+      <h2>Background reading</h2>
+      <ol class="refs">
+        <li><div><span class="t"><a href="https://arxiv.org/abs/1604.03650" target="_blank" rel="noopener">Deep3D: Fully Automatic 2D-to-3D Video Conversion with Deep Convolutional Neural Networks</a></span><span class="v">J. Xie, R. Girshick, A. Farhadi. ECCV 2016.</span></div></li>
+        <li><div><span class="t">Depth-Image-Based Rendering (DIBR), Compression and Transmission for a New Approach on 3D-TV</span><span class="v">C. Fehn. Proc. SPIE 5291, Stereoscopic Displays and Virtual Reality Systems XI, 2004.</span></div></li>
+        <li><div><span class="t"><a href="https://arxiv.org/abs/1907.01341" target="_blank" rel="noopener">Towards Robust Monocular Depth Estimation: Mixing Datasets for Zero-Shot Cross-Dataset Transfer (MiDaS)</a></span><span class="v">R. Ranftl et al. IEEE TPAMI, 2022.</span></div></li>
+        <li><div><span class="t"><a href="https://arxiv.org/abs/2103.13413" target="_blank" rel="noopener">Vision Transformers for Dense Prediction (DPT)</a></span><span class="v">R. Ranftl, A. Bochkovskiy, V. Koltun. ICCV 2021.</span></div></li>
+        <li><div><span class="t"><a href="https://arxiv.org/abs/2302.12288" target="_blank" rel="noopener">ZoeDepth: Zero-shot Transfer by Combining Relative and Metric Depth</a></span><span class="v">S. F. Bhat et al. arXiv, 2023.</span></div></li>
+        <li><div><span class="t"><a href="https://arxiv.org/abs/2406.09414" target="_blank" rel="noopener">Depth Anything V2</a></span><span class="v">L. Yang et al. NeurIPS 2024.</span></div></li>
+        <li><div><span class="t"><a href="https://arxiv.org/abs/2410.02073" target="_blank" rel="noopener">Depth Pro: Sharp Monocular Metric Depth in Less Than a Second</a></span><span class="v">A. Bochkovskii et al. ICLR 2025.</span></div></li>
+        <li><div><span class="t"><a href="https://arxiv.org/abs/2501.12375" target="_blank" rel="noopener">Video Depth Anything: Consistent Depth Estimation for Super-Long Videos</a></span><span class="v">S. Chen et al. CVPR 2025.</span></div></li>
+        <li><div><span class="t"><a href="https://arxiv.org/abs/2503.22262" target="_blank" rel="noopener">Mono2Stereo: A Benchmark and Empirical Study for Stereo Conversion</a></span><span class="v">S. Yu et al. CVPR 2025.</span></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
 
 <footer class="mono">
   <div class="wrap">
@@ -245,6 +354,91 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
   bD.onclick = function () { set('depth'); };
   slider.oninput = function () { if (still) draw(0); };
   requestAnimationFrame(draw);
+})();
+</script>
+<script>
+(function () {
+  var W = 400, H = 300, HZ = 188;
+  var objs = [
+    { t: 'c', x: 294, y: 94, r: 44, z: .25, col: '#e8b04a' },
+    { t: 'r', x: 56, y: 125, w: 94, h: 106, z: .45, col: '#3b78c4' },
+    { t: 'c', x: 225, y: 194, r: 50, z: .7, col: '#4c9e68' },
+    { t: 't', x: 125, y: 250, s: 69, z: .95, col: '#d24a5c' }
+  ];
+  function shape(c, o) {
+    c.beginPath();
+    if (o.t === 'c') c.arc(o.x, o.y, o.r, 0, 6.2832);
+    else if (o.t === 'r') c.rect(o.x, o.y, o.w, o.h);
+    else { c.moveTo(o.x, o.y - o.s); c.lineTo(o.x + o.s, o.y + o.s * .2); c.lineTo(o.x - o.s * .9, o.y + o.s * .3); c.closePath(); }
+  }
+  function mk() { var e = document.createElement('canvas'); e.width = W; e.height = H; return e; }
+  var src = mk(), dep = mk(), cs = src.getContext('2d'), cd = dep.getContext('2d');
+
+  var sky = cs.createLinearGradient(0, 0, 0, HZ); sky.addColorStop(0, '#bcd7ee'); sky.addColorStop(1, '#eef3f7');
+  cs.fillStyle = sky; cs.fillRect(0, 0, W, HZ);
+  cs.fillStyle = '#d9cbb0'; cs.fillRect(0, HZ, W, H - HZ);
+  cs.strokeStyle = '#b3a283'; cs.lineWidth = 1.5;
+  for (var i = 1; i < 9; i++) { var y = HZ + i * i * 1.6; cs.beginPath(); cs.moveTo(0, y); cs.lineTo(W, y); cs.stroke(); }
+  for (var j = -6; j <= 6; j++) { cs.beginPath(); cs.moveTo(W / 2 + j * 25, HZ); cs.lineTo(W / 2 + j * 94, H); cs.stroke(); }
+  objs.forEach(function (o) { shape(cs, o); cs.fillStyle = o.col; cs.fill(); cs.lineWidth = 2.5; cs.strokeStyle = '#222'; cs.stroke(); });
+
+  cd.fillStyle = '#000'; cd.fillRect(0, 0, W, HZ);
+  var fl = cd.createLinearGradient(0, HZ, 0, H); fl.addColorStop(0, '#000'); fl.addColorStop(1, '#fff');
+  cd.fillStyle = fl; cd.fillRect(0, HZ, W, H - HZ);
+  objs.forEach(function (o) { var v = Math.round(o.z * 255), g = 'rgb(' + v + ',' + v + ',' + v + ')'; shape(cd, o); cd.fillStyle = g; cd.fill(); cd.lineWidth = 2.5; cd.strokeStyle = g; cd.stroke(); });
+
+  var S = cs.getImageData(0, 0, W, H).data, D = cd.getImageData(0, 0, W, H).data;
+  function put(id, px) { document.getElementById(id).getContext('2d').putImageData(new ImageData(px, W, H), 0, 0); }
+  document.getElementById('s1').getContext('2d').drawImage(src, 0, 0);
+  document.getElementById('s2').getContext('2d').drawImage(dep, 0, 0);
+
+  function warp(eye, k) {
+    var out = new Uint8ClampedArray(W * H * 4), zb = new Float32Array(W * H).fill(-1);
+    for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+      var i = y * W + x, z = D[i * 4] / 255, nx = x + Math.round(eye * k * (z - .5));
+      if (nx < 0 || nx >= W) continue;
+      var n = y * W + nx;
+      if (z > zb[n]) { zb[n] = z; out[n * 4] = S[i * 4]; out[n * 4 + 1] = S[i * 4 + 1]; out[n * 4 + 2] = S[i * 4 + 2]; out[n * 4 + 3] = 255; }
+    }
+    return { px: out, zb: zb };
+  }
+  function holes(w) {
+    var px = new Uint8ClampedArray(w.px);
+    for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+      var n = y * W + x; if (w.zb[n] >= 0) continue;
+      var on = ((x + y) >> 2) & 1;
+      px[n * 4] = 255; px[n * 4 + 1] = on ? 43 : 255; px[n * 4 + 2] = on ? 214 : 255; px[n * 4 + 3] = 255;
+    }
+    return px;
+  }
+  function fill(w) {
+    var px = new Uint8ClampedArray(w.px), zb = w.zb;
+    for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+      var n = y * W + x; if (zb[n] >= 0) continue;
+      var l = x - 1, r = x + 1;
+      while (l >= 0 && zb[y * W + l] < 0) l--;
+      while (r < W && zb[y * W + r] < 0) r++;
+      var s = l < 0 ? r : r >= W ? l : (zb[y * W + l] <= zb[y * W + r] ? l : r);
+      if (s < 0 || s >= W) continue;
+      var m = (y * W + s) * 4;
+      px[n * 4] = px[m]; px[n * 4 + 1] = px[m + 1]; px[n * 4 + 2] = px[m + 2]; px[n * 4 + 3] = 255;
+    }
+    return px;
+  }
+  var slider = document.getElementById('k2');
+  function run() {
+    var k = +slider.value;
+    var wl = warp(1, k), wr = warp(-1, k), L = fill(wl), R = fill(wr);
+    put('s3', holes(wr)); put('s4', R);
+    var O = new Uint8ClampedArray(W * H * 4);
+    for (var i = 0; i < O.length; i += 4) {
+      O[i] = .299 * L[i] + .587 * L[i + 1] + .114 * L[i + 2];
+      O[i + 1] = R[i + 1]; O[i + 2] = R[i + 2]; O[i + 3] = 255;
+    }
+    put('s5', O);
+  }
+  slider.addEventListener('input', run);
+  run();
 })();
 </script>
 </body>
